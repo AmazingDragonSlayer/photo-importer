@@ -84,11 +84,10 @@ parser.add_argument('-m','--method', action='store', default='cp', choices=['cp'
 parser.add_argument('-o','--overwrite', action='store', default='no', choices=['yes','no'], help='Whether to overwrite if target image exists', dest='overwrite')
 parser.add_argument('src', help='Which files to process.')
 parser.add_argument('dst', help='Top level directory to which files will be copied (moved). Inside it apropriate subdirectories (YYYY/MM/DD) will be created.' )
-# dodatkowo można jeszcze - domyślne rozszerzenie pobierać, jakieś warunki co do pewnych cech plików które importujemy (większe niż)
-# i jescze czy rekurencyjnei przetwarzac src
-#@todo sprawdzac czy plik jest taki sam zanim się go zastąpi !!!!
-#@todo dodać jeszcze nie case sensitive rozszerzenie
-#@todo jeszcze moglby sprawdzac czy nie ma go w innych lokacjach (inne daty przypadkiem) i np przenosic
+#@todo minimum file size / resolution?
+#@todo recursive in-depth search
+#@todo extension should be not case sensitive
+#@todo maybe check if file is not elsewhere (in other possible date-based locations)
 args = parser.parse_args()
 
 if not os.path.isdir(args.dst):
@@ -111,11 +110,7 @@ for file in files:
     if not os.path.exists(file_target_dir):
         os.makedirs(file_target_dir)
 
-    # jezeli plik istnieje to sprawdzamy czy jest to ten sam plik
-    # jezeli to ten sam plik, nadpisujemy tylko jezeli overwrite = yes
-
-    # jezeli to nie jest ten sam plik nazwa zostanie zmieniona
-
+    
     if os.path.exists(file_target_path):
         if is_same_file(file, file_target_path):
             if args.overwrite == 'no':

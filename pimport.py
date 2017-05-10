@@ -86,7 +86,6 @@ parser.add_argument('-r', '--recursive', action='store_true', help='Recursive se
 parser.add_argument('src', help='Which files to process.')
 parser.add_argument('dst', help='Top level directory to which files will be copied (moved). Inside it apropriate subdirectories (YYYY/MM/DD) will be created.' )
 #@todo minimum file size / resolution?
-#@todo extension should be not case sensitive
 #@todo maybe check if file is not elsewhere (in other possible date-based locations)
 args = parser.parse_args()
 

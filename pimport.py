@@ -7,7 +7,7 @@ import shutil
 from datetime import datetime
 import re
 import hashlib
-
+import fnmatch
 
 # Exif Tags reference: http://www.awaresystems.be/imaging/tiff/tifftags/privateifd/exif.html
 
@@ -80,12 +80,12 @@ def is_same_file(file1, file2):
     
 
 parser = argparse.ArgumentParser(description='Import photos from directory to certain location and create date-based directory structure.')
-parser.add_argument('-m','--method', action='store', default='cp', choices=['cp','mv'], help='Whether to copy or move files from location.', dest='method')
-parser.add_argument('-o','--overwrite', action='store', default='no', choices=['yes','no'], help='Whether to overwrite if target image exists', dest='overwrite')
+parser.add_argument('-m', '--method', action='store', default='cp', choices=['cp','mv'], help='Whether to copy or move files from location.', dest='method')
+parser.add_argument('-o', '--overwrite', action='store_true', help='Whether to overwrite if target image exists', dest='overwrite')
+parser.add_argument('-r', '--recursive', action='store_true', help='Recursive search', dest='recursive')
 parser.add_argument('src', help='Which files to process.')
 parser.add_argument('dst', help='Top level directory to which files will be copied (moved). Inside it apropriate subdirectories (YYYY/MM/DD) will be created.' )
 #@todo minimum file size / resolution?
-#@todo recursive in-depth search
 #@todo extension should be not case sensitive
 #@todo maybe check if file is not elsewhere (in other possible date-based locations)
 args = parser.parse_args()
@@ -96,7 +96,14 @@ if not os.path.isdir(args.dst):
 args.src = normalize_src_path(args.src)
 args.dst = normalize_dst_path(args.dst)
 
-files = glob(args.src)
+files = []
+
+if args.recursive:
+    for root, dirnames, filenames in os.walk(os.path.dirname(args.src)):
+        for filename in fnmatch.filter(filenames, os.path.basename(args.src)):
+            files.append(os.path.join(root, filename))
+else:
+    files = glob(args.src)
 
 if len(files) == 0:
     raise IOError("No files found")
@@ -113,7 +120,7 @@ for file in files:
     
     if os.path.exists(file_target_path):
         if is_same_file(file, file_target_path):
-            if args.overwrite == 'no':
+            if args.overwrite == False:
                 print file, ' already exists... skipping'
                 continue
 
